@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private bool isFacingRight = true;
     private int score = 0;
+    public GameObject messageFindSword;
+    public GameObject messageGotSword;
 
     void Start()
     {
@@ -100,7 +102,13 @@ public class PlayerController : MonoBehaviour
             hasSword = true;
             Debug.Log("Espada obtenida.");
             Destroy(other.gameObject);
-        }
+
+            if (messageFindSword != null)
+                messageFindSword.SetActive(false);
+
+            if (messageGotSword != null)
+                messageGotSword.SetActive(true);
+        }   
 
         // --- Estatua (Key) ---
         if (other.CompareTag("Key"))
@@ -167,8 +175,12 @@ public class PlayerController : MonoBehaviour
     {
         if (nucleo + gota >= totalItemsRequired)
         {
-            Debug.Log("Todos los coleccionables completos → aparece la espada");
+            Debug.Log("Se han recogido todos los coleccionables. Aparece la espada.");
             swordObject.SetActive(true);
+
+            // Mostrar mensaje de buscar la espada
+            if (messageFindSword != null)
+                messageFindSword.SetActive(true);
         }
     }
 }
