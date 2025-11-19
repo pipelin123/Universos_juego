@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -17,11 +18,23 @@ public class PlayerController : MonoBehaviour
     private float horizontalInput;
     private bool isGrounded;
     private bool isFacingRight = true;
-
+    public int nucleo = 0;
+    public int gota = 0;
+    public int score = 0;
+    public bool hasKey = false;
+    public bool hasSpike = false;
+    public TextMeshProUGUI textNucleo;
+    public TextMeshProUGUI textGota;
+    public TextMeshProUGUI textScore;
+    public GameObject GameOverPanel;
+    public GameObject VictoryPanel;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>(); // ← obtenemos el Animator
+        UpdateTextNucleo();
+        UpdateTextGota();
+        UpdateTextScore();
     }
 
     void Update()
@@ -41,7 +54,58 @@ public class PlayerController : MonoBehaviour
         // 4. Voltear sprite
         FlipSprite();
     }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        //Debug.Print("prueba");
+        if (other.CompareTag("nucleo"))
+        {
+            nucleo = nucleo + 1;
+            UpdateTextNucleo();
 
+            Destroy(other.gameObject);
+            Debug.Log("Collected!!!");
+            Debug.Log("Score: " + nucleo);
+            score = score + 100;
+            UpdateTextScore();
+
+        }
+        if (other.CompareTag("gota"))
+        {
+            gota = gota + 1;
+            UpdateTextGota();
+
+            Destroy(other.gameObject);
+            Debug.Log("Collected!!!");
+            jumpForce += 2f;
+            Debug.Log("Score: " + gota);
+            score = score + 200;
+            UpdateTextScore();
+
+        }
+        if (other.CompareTag("Key"))
+        {
+            hasKey = true;
+            Debug.Log("has recolectado la llave!");
+            Destroy(other.gameObject);
+            
+        }
+        if (other.CompareTag("Spike"))
+        {
+            hasSpike = true;
+            Debug.Log("has muerto!");
+            GameOverPanel.SetActive(true);
+            Time.timeScale = 0f;
+        }
+        
+        
+        //codicion de victoria
+        if (nucleo + gota >= 30 || hasKey && !hasSpike)  //solo en un booleano si se pregunta sin nada es verdadero, y con un signo de admiracion al principio es falso
+        {
+            Debug.Log("Has ganado. Tienes suficientes puntos, la llave y no has tocado los pinchos");
+            VictoryPanel.SetActive(true);
+            Time.timeScale = 0f;
+        }
+    }
     void FixedUpdate()
     {
         // 5. Comprobar si está en el suelo
@@ -82,5 +146,19 @@ public class PlayerController : MonoBehaviour
         if (groundCheck == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
+    void UpdateTextNucleo()
+    {
+        textNucleo.text = nucleo +"/7";
+    }
+
+    void UpdateTextGota()
+    {
+        textGota.text = gota +"/6";
+    }
+
+    void UpdateTextScore()
+    {
+        textScore.text = score +"";
     }
 }
